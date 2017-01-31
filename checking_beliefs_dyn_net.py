@@ -16,6 +16,7 @@ for c in ['A', 'R1', 'R2', 'R3', 'B', 'D']:
     f = Function(c, BitVecSort(3), BitVecSort(3), BoolSort())
     rels[c] = f
     fp.register_relation(f)
+    fp.set_predicate_representation(f, 'doc')
 
 # Guards
 g12 = And(Extract(2, 1, dst) == 0b10, Extract(2, 1, dst) == 0b01)
@@ -34,9 +35,8 @@ fp.rule(rels['R3'](dst_next, src_next), And(rels['D'](dst, src), g3d, ld))
 fp.rule(rels['R3'](dst_next, src_next), And(rels['R2'](dst, src), g32, set0))
 fp.rule(rels['A'](dst, src), rels['R1'](dst, src))
 
+# Starting Point
 fp.fact(rels['B'](dst, src))
 
-print(fp)
-print(fp.query(rels['A'](dst, src)))
-print(fp.get_answer())
-
+if fp.query(rels['A'](dst, src), rels['R3'](dst, src)):
+    print(fp.get_answer())
