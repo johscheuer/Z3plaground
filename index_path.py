@@ -44,3 +44,8 @@ print(fp.get_answer())
 # doesn't work -> query A -> SF -> B
 print(fp.query(rels['SF'](index), rels['B'](index)))
 print(fp.get_answer())
+
+# work -> query A -> SF
+print(fp.query(rels['SF'](index)))
+print(fp.get_answer())
+
