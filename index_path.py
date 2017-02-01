@@ -3,6 +3,7 @@ from z3 import *
 
 fp = Fixedpoint()
 args = {
+    'fixedpoint.engine' : 'pdr',
     'fixedpoint.pdr.farkas': True,
     'fixedpoint.datalog.generate_explanations': True
 }
@@ -31,21 +32,14 @@ copy_index = index_next == index
 # Relations
 fp.rule(rels['SF'](index_next), And(rels['H'](index), ghsf, copy_index))
 fp.rule(rels['B'](index_next), And(rels['H'](index), ghb, copy_index))
-fp.rule(rels['H'](index_next), And(rels['SF'](index), gsfh, dec_index))
+fp.rule(rels['H'](index_next), And(rels['SF'](index), ghb, copy_index))
+# We need to add this rule to enable Query A -> SF -> B
+fp.rule(rels['SF'](index_next), And(rels['SF'](index), gsfh, dec_index))
 fp.rule(rels['H'](index), rels['A'](index))
+# fp.fact(rels['A'](index))
+fp.fact(rels['A'](255))
 
-fp.fact(rels['A'](index))
-
-#print(fp)
-
-print(fp.query(rels['B'](index)))
-print(fp.get_answer())
-
-# doesn't work -> query A -> SF -> B
-print(fp.query(rels['SF'](index), rels['B'](index)))
-print(fp.get_answer())
-
-# work -> query A -> SF
-print(fp.query(rels['SF'](index)))
+# Query A -> SF -> B
+print(fp.query(rels['SF'](index), rels['B'](index), index == 254))
 print(fp.get_answer())
 

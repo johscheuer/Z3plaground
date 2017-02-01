@@ -105,5 +105,5 @@ t4 = {"guard": And(state == P2, index == 254),
       "effect": [P1, index]}
 
 ptr = TraindextionSystem(And(state == P0, index == 255), [t1, t2, t3, t4], [state, index])
-ptr.query(state == P1)
+ptr.query(And(state == P1, index == 254))
 
