@@ -11,11 +11,11 @@ def flatten(l):
     return [s for t in l for s in t]
 
 
-class TraindextionSystem():
-    def __init__(self, initial, traindextions, vars1):
+class TransistionSystem():
+    def __init__(self, initial, transistions, vars1):
         self.fp = Fixedpoint()
         self.initial = initial
-        self.traindextions = traindextions
+        self.transistions = transistions
         self.vars1 = vars1
         var_sorts = [v.sort() for v in self.vars1]
         state_sorts = var_sorts
@@ -29,8 +29,7 @@ class TraindextionSystem():
         self.fp.register_relation(self.state)
         self.fp.register_relation(self.step)
 
-    # Set of reachable states are traindextive closure of step.
-
+    # Set of reachable states are transistion closure of step.
     def state0(self):
         idx = range(len(self.state_sorts))
         return self.state([Var(i, self.state_sorts[i]) for i in idx])
@@ -49,13 +48,13 @@ class TraindextionSystem():
     def declare_reachability(self):
         self.fp.rule(self.state1(), [self.state0(), self.rho()])
 
-    # Define traindextion relation
+    # Define transistion relation
     def abstract(self, e):
         n = len(self.state_sorts)
         sub = [(self.state_vals[i], Var(i, self.state_sorts[i])) for i in range(n)]
         return substitute(e, sub)
 
-    def declare_traindextion(self, tr):
+    def declare_transistion(self, tr):
         len_s = len(self.state_sorts)
         effect = tr["effect"]
         vars1 = [Var(i, self.state_sorts[i]) for i in range(len_s)] + effect
@@ -63,9 +62,9 @@ class TraindextionSystem():
         guard = self.abstract(tr["guard"])
         self.fp.rule(rho1, guard)
 
-    def declare_traindextions(self):
-        for t in self.traindextions:
-            self.declare_traindextion(t)
+    def declare_transistions(self):
+        for t in self.transistions:
+            self.declare_transistion(t)
 
     def declare_initial(self):
         self.fp.rule(self.state0(), [self.abstract(self.initial)])
@@ -74,7 +73,7 @@ class TraindextionSystem():
         self.declare_rels()
         self.declare_initial()
         self.declare_reachability()
-        self.declare_traindextions()
+        self.declare_transistions()
         print(self.fp.query(And(self.state0(), self.abstract(query))))
         print(self.fp.get_answer())
 
@@ -85,7 +84,6 @@ P.declare('P1')
 P.declare('P2')
 P.declare('P3')
 P = P.create()
-
 
 P0 = P.P0
 P1 = P.P1
@@ -104,6 +102,6 @@ t3 = {"guard": And(state == P3, index == 255),
 t4 = {"guard": And(state == P2, index == 254),
       "effect": [P1, index]}
 
-ptr = TraindextionSystem(And(state == P0, index == 255), [t1, t2, t3, t4], [state, index])
+ptr = TransistionSystem(And(state == P0, index == 255), [t1, t2, t3, t4], [state, index])
 ptr.query(And(state == P1, index == 254))
 
